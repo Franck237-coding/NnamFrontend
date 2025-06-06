@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nnam - Du champ à votre assiette</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <style>
+        /* Couleurs personnalisées basées sur le logo Nnam */
+        :root {
+            --nnam-brown: #6D4C41;
+            --nnam-light-brown: #8D6E63;
+            --nnam-green: #4CAF50;
+            --nnam-orange: #FF9800;
+            --nnam-white: #FFFFFF;
+            --nnam-light-gray: #F5F5F5;
+        }
+
+        .bg-nnam-brown { background-color: var(--nnam-brown); }
+        .bg-nnam-light-brown { background-color: var(--nnam-light-brown); }
+        .bg-nnam-green { background-color: var(--nnam-green); }
+        .bg-nnam-orange { background-color: var(--nnam-orange); }
+        .text-nnam-brown { color: var(--nnam-brown); }
+        .text-nnam-green { color: var(--nnam-green); }
+        .text-nnam-orange { color: var(--nnam-orange); }
+        .border-nnam-orange { border-color: var(--nnam-orange); }
+        .border-nnam-green { border-color: var(--nnam-green); }
+
+        /* Animations personnalisées */
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Carousel styles */
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-slide {
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .carousel-slide.active {
+            display: block;
+        }
+
+        /* Product hover effects */
+        .product-card {
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        /* Formulaires modernes */
+        .form-input {
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+        }
+
+        /* Navigation active state */
+        .nav-link:hover {
+            color: var(--nnam-orange);
+            transition: color 0.3s ease;
+        }
+
+        /* Page transitions */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Responsive design amélioré */
+        @media (max-width: 768px) {
+            .mobile-hidden { display: none; }
+            .mobile-menu { display: block; }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-menu { display: none; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation Bar -->
+    <nav class="bg-nnam-brown shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center cursor-pointer" onclick="showPage('home')">
+                    <div class="bg-nnam-green p-2 rounded-lg mr-3">
+                        <i class="fas fa-leaf text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-nnam-orange text-2xl font-bold">N</span>
+                        <span class="text-white text-xl font-semibold">nam</span>
+                        <div class="text-white text-xs">Du champ à votre assiette!</div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links (Desktop) -->
+                <div class="hidden md:flex items-center space-x-6">
+                    <a href="#" class="text-white nav-link" onclick="showPage('home')">Accueil</a>
+                    
+                    <!-- Barre de recherche -->
+                    <div class="relative">
+                        <input type="text" placeholder="Rechercher..." class="px-4 py-2 rounded-lg bg-white text-gray-800 w-64">
+                        <i class="fas fa-search absolute right-3 top-3 text-gray-500"></i>
+                    </div>
+
+                    <!-- Catégories Dropdown -->
+                    <div class="relative">
+                        <button class="text-white nav-link flex items-center" onclick="toggleDropdown('categories')">
+                            Catégories <i class="fas fa-chevron-down ml-1"></i>
+                        </button>
+                        <div id="categories-dropdown" class="absolute top-full left-0 bg-white rounded-lg shadow-lg py-2 w-48 mt-2 hidden slide-down">
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showCategory('tubercules')">Tubercules</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showCategory('cereales')">Céréales</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showCategory('fruits')">Fruits</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showCategory('legumes')">Légumes</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showCategory('epices')">Épices</a>
+                        </div>
+                    </div>
+
+                    <!-- S'inscrire Dropdown -->
+                    <div class="relative">
+                        <button class="text-white nav-link flex items-center" onclick="toggleDropdown('register')">
+                            S'inscrire <i class="fas fa-chevron-down ml-1"></i>
+                        </button>
+                        <div id="register-dropdown" class="absolute top-full left-0 bg-white rounded-lg shadow-lg py-2 w-48 mt-2 hidden slide-down">
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showRegisterForm('agriculteur')">Agriculteur</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showRegisterForm('client')">Client</a>
+                        </div>
+                    </div>
+
+                    <!-- Se connecter Dropdown -->
+                    <div class="relative">
+                        <button class="text-white nav-link flex items-center" onclick="toggleDropdown('login')">
+                            Se connecter <i class="fas fa-chevron-down ml-1"></i>
+                        </button>
+                        <div id="login-dropdown" class="absolute top-full left-0 bg-white rounded-lg shadow-lg py-2 w-48 mt-2 hidden slide-down">
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showLoginForm('agriculteur')">Agriculteur</a>
+                            <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100" onclick="showLoginForm('client')">Client</a>
+                        </div>
+                    </div>
+
+                    <!-- Panier -->
+                    <div class="relative cursor-pointer" onclick="showPage('cart')">
+                        <i class="fas fa-shopping-cart text-white text-xl"></i>
+                        <span id="cart-count" class="absolute -top-2 -right-2 bg-nnam-orange text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">0</span>
+                    </div>
+                </div>
+
+                <!-- Mobile menu button -->
+                <button class="md:hidden text-white" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden bg-nnam-light-brown hidden">
+            <div class="px-4 py-2 space-y-2">
+                <a href="#" class="block text-white py-2" onclick="showPage('home')">Accueil</a>
+                <a href="#" class="block text-white py-2" onclick="toggleDropdown('mobile-categories')">Catégories</a>
+                <a href="#" class="block text-white py-2" onclick="toggleDropdown('mobile-register')">S'inscrire</a>
+                <a href="#" class="block text-white py-2" onclick="toggleDropdown('mobile-login')">Se connecter</a>
+                <a href="#" class="block text-white py-2" onclick="showPage('cart')">Panier</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page d'accueil -->
+    <div id="home-page" class="page active">
+        <!-- Carrousel d'images -->
+        <!--<div class="carousel-container h-96 bg-gray-200 relative">
+            <div class="carousel-slide active h-full bg-gradient-to-r from-nnam-green to-nnam-light-brown flex items-center justify-center">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl font-bold mb-4">Produits Frais du Terroir</h1>
+                    <p class="text-xl">Directement de nos agriculteurs locaux</p>
+                </div>
+            </div>
+            <div class="carousel-slide h-full bg-gradient-to-r from-nnam-orange to-nnam-brown flex items-center justify-center">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl font-bold mb-4">Précommandes Disponibles</h1>
+                    <p class="text-xl">Réservez vos produits de saison</p>
+                </div>
+            </div>
+            <div class="carousel-slide h-full bg-gradient-to-r from-nnam-brown to-nnam-green flex items-center justify-center">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl font-bold mb-4">Agriculture Durable</h1>
+                    <p class="text-xl">Soutenez l'agriculture responsable</p>
+                </div>
+            </div>
+            <div class="carousel-slide h-full bg-gradient-to-r from-nnam-green to-nnam-orange flex items-center justify-center">
+                <div class="text-center text-white">
+                    <h1 class="text-4xl font-bold mb-4">Livraison Rapide</h1>
+                    <p class="text-xl">De la ferme à votre table en 24h</p>
+                </div>
+            </div>
+            
+            <-- Indicateurs de carrousel --
+            <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <div class="w-3 h-3 bg-white rounded-full cursor-pointer" onclick="currentSlide(1)"></div>
+                <div class="w-3 h-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide(2)"></div>
+                <div class="w-3 h-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide(3)"></div>
+                <div class="w-3 h-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide(4)"></div>
+            </div>
+        </div>
+    -->
+
+    <div class="carousel-container h-96 bg-gray-200 relative overflow-hidden">
+        <!-- Slide 1 -->
+        <div class="carousel-slide active h-full bg-cover bg-center flex items-center justify-center"
+             style="background-image: url('agri1.jpg');">
+          <div class="bg-black bg-opacity-50 p-6 rounded text-white text-center">
+            <h1 class="text-4xl font-bold mb-4">Produits Frais du Terroir</h1>
+            <p class="text-xl">Directement de nos agriculteurs locaux</p>
+          </div>
+        </div>
+      
+        <!-- Slide 2 -->
+        <div class="carousel-slide h-full bg-cover bg-center flex items-center justify-center"
+             style="background-image: url('agri2.jpg');">
+          <div class="bg-black bg-opacity-50 p-6 rounded text-white text-center">
+            <h1 class="text-4xl font-bold mb-4">Précommandes Disponibles</h1>
+            <p class="text-xl">Réservez vos produits de saison</p>
+          </div>
+        </div>
+      
+        <!-- Slide 3 -->
+        <div class="carousel-slide h-full bg-cover bg-center flex items-center justify-center"
+             style="background-image: url('agri3.jpg');">
+          <div class="bg-black bg-opacity-50 p-6 rounded text-white text-center">
+            <h1 class="text-4xl font-bold mb-4">Agriculture Durable</h1>
+            <p class="text-xl">Soutenez l'agriculture responsable</p>
+          </div>
+        </div>
+      
+        <!-- Slide 4 -->
+        <div class="carousel-slide h-full bg-cover bg-center flex items-center justify-center"
+             style="background-image: url('assets/images/slide4.jpg');">
+          <div class="bg-black bg-opacity-50 p-6 rounded text-white text-center">
+            <h1 class="text-4xl font-bold mb-4">Livraison Rapide</h1>
+            <p class="text-xl">De la ferme à votre table en 24h</p>
+          </div>
+        </div>
+      
+        <!-- Indicateurs -->
+        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+          <div class="w-3 h-3 bg-white rounded-full cursor-pointer" onclick="currentSlide(1)"></div>
+          <div class="w-3 h-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide(2)"></div>
+          <div class="w-3 h-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide(3)"></div>
+          <div class="w-3 h-3 bg-gray-400 rounded-full cursor-pointer" onclick="currentSlide(4)"></div>
+        </div>
+      </div>
+      
+
+
+        <!-- Section Produits Phares -->
+        <div class="max-w-7xl mx-auto px-4 py-12">
+            <h2 class="text-3xl font-bold text-nnam-brown text-center mb-8">Nos Produits Phares</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Produit 1 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onclick="showProductDetail(1)">
+                    <div class="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                        <i class="fas fa-carrot text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Carottes Bio</h3>
+                        <p class="text-gray-600 text-sm mt-2">Carottes fraîches cultivées sans pesticides</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold">2500 FCFA/kg</span>
+                            <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 1)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit 2 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onclick="showProductDetail(2)">
+                    <div class="h-48 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                        <i class="fas fa-seedling text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Maïs Local</h3>
+                        <p class="text-gray-600 text-sm mt-2">Maïs de première qualité, séché naturellement</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold">1800 FCFA/kg</span>
+                            <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 2)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit 3 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onclick="showProductDetail(3)">
+                    <div class="h-48 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                        <i class="fas fa-apple-alt text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Tomates Fraîches</h3>
+                        <p class="text-gray-600 text-sm mt-2">Tomates juteuses, parfaites pour vos salades</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold">3000 FCFA/kg</span>
+                            <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 3)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit 4 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onclick="showProductDetail(4)">
+                    <div class="h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-pepper-hot text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Piment Rouge</h3>
+                        <p class="text-gray-600 text-sm mt-2">Piment fort pour relever vos plats traditionnels</p>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold">5000 FCFA/kg</span>
+                            <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 4)">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Pourquoi Consommer Local -->
+        <div class="bg-nnam-light-brown py-16">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="text-3xl font-bold text-white text-center mb-12">Pourquoi Choisir Local ?</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center text-white">
+                        <div class="bg-nnam-green w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-leaf text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Produits Frais</h3>
+                        <p class="text-gray-100">Récoltés à maturité et livrés rapidement pour préserver toutes leurs qualités nutritionnelles.</p>
+                    </div>
+                    <div class="text-center text-white">
+                        <div class="bg-nnam-orange w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-heart text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Soutien Local</h3>
+                        <p class="text-gray-100">Encouragez l'économie locale en achetant directement auprès de nos agriculteurs partenaires.</p>
+                    </div>
+                    <div class="text-center text-white">
+                        <div class="bg-nnam-green w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-recycle text-2xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Écologique</h3>
+                        <p class="text-gray-100">Réduisez votre empreinte carbone avec des produits cultivés près de chez vous.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-nnam-brown text-white py-12">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- À propos -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-nnam-orange">À Propos</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="hover:text-nnam-orange transition">Notre Mission</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Nos Valeurs</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">L'Équipe</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Contact</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Liens Utiles -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-nnam-orange">Liens Utiles</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="hover:text-nnam-orange transition">Comment Commander</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Devenir Agriculteur</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Programme de Fidélité</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Blog</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Informations -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-nnam-orange">Informations</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="hover:text-nnam-orange transition">Conditions d'utilisation</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Politique de confidentialité</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Livraison</a></li>
+                            <li><a href="#" class="hover:text-nnam-orange transition">Retours</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-4 text-nnam-orange">Newsletter</h3>
+                        <p class="mb-4">Restez informé de nos dernières offres et nouveautés.</p>
+                        <div class="flex">
+                            <input type="email" placeholder="Votre email" class="flex-1 px-3 py-2 rounded-l bg-white text-gray-800">
+                            <button class="bg-nnam-orange px-4 py-2 rounded-r hover:bg-orange-600 transition">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="flex space-x-4 mt-4">
+                            <a href="#" class="text-xl hover:text-nnam-orange transition"><i class="fab fa-facebook"></i></a>
+                            <a href="#" class="text-xl hover:text-nnam-orange transition"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-xl hover:text-nnam-orange transition"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-xl hover:text-nnam-orange transition"><i class="fab fa-whatsapp"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-600 mt-8 pt-8 text-center">
+                    <p>&copy; 2024 Nnam - Du champ à votre assiette. Tous droits réservés.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Page Agriculteur -->
+    <div id="farmer-page" class="page">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <!-- En-tête Agriculteur -->
+            <div class="bg-nnam-green text-white rounded-lg p-6 mb-8">
+                <h1 class="text-3xl font-bold mb-2">Espace Agriculteur</h1>
+                <p class="text-green-100">Gérez vos produits et suivez vos commandes</p>
+            </div>
+
+            <!-- Statistiques Agriculteur -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <div class="text-3xl font-bold text-nnam-green">12</div>
+                    <div class="text-gray-600">Produits Actifs</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <div class="text-3xl font-bold text-nnam-orange">8</div>
+                    <div class="text-gray-600">Commandes en Cours</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <div class="text-3xl font-bold text-nnam-brown">45,000</div>
+                    <div class="text-gray-600">Revenus (FCFA)</div>
+                </div>
+                <div class="bg-white rounded-lg shadow p-6 text-center">
+                    <div class="text-3xl font-bold text-green-600">156</div>
+                    <div class="text-gray-600">Total Commandes</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Ajout de Produit -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-nnam-brown mb-6">Ajouter un Produit</h2>
+                    <form id="add-product-form" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Nom du Produit</label>
+                            <input type="text" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" placeholder="Ex: Tomates cerises bio">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Catégorie</label>
+                            <select class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green">
+                                <option>Légumes</option>
+                                <option>Fruits</option>
+                                <option>Céréales</option>
+                                <option>Tubercules</option>
+                                <option>Épices</option>
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Prix (FCFA/kg)</label>
+                                <input type="number" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" placeholder="2500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Quantité (kg)</label>
+                                <input type="number" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" placeholder="50">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Description</label>
+                            <textarea class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" rows="3" placeholder="Décrivez votre produit..."></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Date de Récolte</label>
+                            <input type="date" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green">
+                        </div>
+                        <button type="submit" class="w-full bg-nnam-green text-white py-2 px-4 rounded-lg hover:bg-green-600 transition">
+                            <i class="fas fa-plus mr-2"></i>Ajouter le Produit
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Gestion des Produits -->
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-nnam-brown mb-6">Mes Produits</h2>
+                    <div class="space-y-4">
+                        <!-- Produit 1 -->
+                        <div class="border rounded-lg p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-nnam-brown">Carottes Bio</h3>
+                                <p class="text-gray-600 text-sm">2500 FCFA/kg - Stock: 25kg</p>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Actif</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-600 hover:text-blue-800" onclick="editProduct(1)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-600 hover:text-red-800" onclick="deleteProduct(1)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Produit 2 -->
+                        <div class="border rounded-lg p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-nnam-brown">Maïs Local</h3>
+                                <p class="text-gray-600 text-sm">1800 FCFA/kg - Stock: 40kg</p>
+                                <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Actif</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-600 hover:text-blue-800" onclick="editProduct(2)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-600 hover:text-red-800" onclick="deleteProduct(2)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Produit 3 -->
+                        <div class="border rounded-lg p-4 flex justify-between items-center">
+                            <div>
+                                <h3 class="font-semibold text-nnam-brown">Tomates Fraîches</h3>
+                                <p class="text-gray-600 text-sm">3000 FCFA/kg - Stock: 0kg</p>
+                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">Rupture</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="text-blue-600 hover:text-blue-800" onclick="editProduct(3)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-600 hover:text-red-800" onclick="deleteProduct(3)">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commandes Reçues -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
+                <h2 class="text-2xl font-bold text-nnam-brown mb-6">Commandes Reçues</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-2 text-left">N° Commande</th>
+                                <th class="px-4 py-2 text-left">Client</th>
+                                <th class="px-4 py-2 text-left">Produits</th>
+                                <th class="px-4 py-2 text-left">Montant</th>
+                                <th class="px-4 py-2 text-left">Statut</th>
+                                <th class="px-4 py-2 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t">
+                                <td class="px-4 py-2">#001</td>
+                                <td class="px-4 py-2">Jean Dupont</td>
+                                <td class="px-4 py-2">Carottes Bio (2kg)</td>
+                                <td class="px-4 py-2">5,000 FCFA</td>
+                                <td class="px-4 py-2">
+                                    <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">En attente</span>
+                                </td>
+                                <td class="px-4 py-2">
+                                    <button class="bg-nnam-green text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                                        Accepter
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-t">
+                                <td class="px-4 py-2">#002</td>
+                                <td class="px-4 py-2">Marie Martin</td>
+                                <td class="px-4 py-2">Maïs Local (5kg)</td>
+                                <td class="px-4 py-2">9,000 FCFA</td>
+                                <td class="px-4 py-2">
+                                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">Confirmée</span>
+                                </td>
+                                <td class="px-4 py-2">
+                                    <button class="bg-nnam-orange text-white px-3 py-1 rounded text-sm hover:bg-orange-600">
+                                        Préparer
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Client -->
+    <div id="client-page" class="page">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <!-- En-tête Client -->
+            <div class="bg-nnam-orange text-white rounded-lg p-6 mb-8">
+                <h1 class="text-3xl font-bold mb-2">Espace Client</h1>
+                <p class="text-orange-100">Découvrez nos produits frais et locaux</p>
+            </div>
+
+            <!-- Filtres et Recherche -->
+            <div class="bg-white rounded-lg shadow p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Rechercher</label>
+                        <input type="text" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-orange" placeholder="Nom du produit...">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Catégorie</label>
+                        <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-orange">
+                            <option>Toutes les catégories</option>
+                            <option>Légumes</option>
+                            <option>Fruits</option>
+                            <option>Céréales</option>
+                            <option>Tubercules</option>
+                            <option>Épices</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Prix Max (FCFA)</label>
+                        <input type="number" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-orange" placeholder="5000">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Disponibilité</label>
+                        <select class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-orange">
+                            <option>Tous</option>
+                            <option>En stock</option>
+                            <option>Précommande</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations Panier -->
+            <div class="bg-nnam-green text-white rounded-lg p-4 mb-8 flex justify-between items-center">
+                <div class="flex items-center">
+                    <i class="fas fa-shopping-cart mr-3 text-xl"></i>
+                    <span class="font-semibold">Articles dans le panier: <span id="client-cart-count">3</span></span>
+                </div>
+                <div>
+                    <span class="font-semibold">Total: <span id="cart-total">12,500</span> FCFA</span>
+                </div>
+            </div>
+
+            <!-- Catalogue de Produits -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Produit Client 1 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
+                        <i class="fas fa-carrot text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Carottes Bio</h3>
+                        <p class="text-gray-600 text-sm mt-2">Fermier: Jean-Baptiste</p>
+                        <p class="text-gray-600 text-sm">Stock: 25kg disponibles</p>
+                        <div class="flex items-center mt-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(24 avis)</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold text-lg">2,500 FCFA/kg</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" min="1" value="1" class="w-16 px-2 py-1 border rounded text-center">
+                                <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 'carottes')">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit Client 2 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                        <i class="fas fa-seedling text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Maïs Local</h3>
+                        <p class="text-gray-600 text-sm mt-2">Fermier: Marie Kouassi</p>
+                        <p class="text-gray-600 text-sm">Stock: 40kg disponibles</p>
+                        <div class="flex items-center mt-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(18 avis)</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold text-lg">1,800 FCFA/kg</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" min="1" value="1" class="w-16 px-2 py-1 border rounded text-center">
+                                <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 'mais')">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit Client 3 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center">
+                        <i class="fas fa-apple-alt text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Tomates Fraîches</h3>
+                        <p class="text-gray-600 text-sm mt-2">Fermier: Paul Diallo</p>
+                        <p class="text-red-600 text-sm font-medium">Rupture de stock</p>
+                        <div class="flex items-center mt-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(31 avis)</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold text-lg">3,000 FCFA/kg</span>
+                            <button class="bg-gray-400 text-white px-3 py-1 rounded cursor-not-allowed" disabled>
+                                Indisponible
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produit Client 4 -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
+                        <i class="fas fa-pepper-hot text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Piment Rouge</h3>
+                        <p class="text-gray-600 text-sm mt-2">Fermier: Fatou Traoré</p>
+                        <p class="text-gray-600 text-sm">Stock: 15kg disponibles</p>
+                        <div class="flex items-center mt-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(12 avis)</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold text-lg">5,000 FCFA/kg</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" min="1" value="1" class="w-16 px-2 py-1 border rounded text-center">
+                                <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 'piment')">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Produits supplémentaires -->
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center">
+                        <i class="fas fa-lemon text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Oranges Douces</h3>
+                        <p class="text-gray-600 text-sm mt-2">Fermier: Kofi Asante</p>
+                        <p class="text-gray-600 text-sm">Stock: 30kg disponibles</p>
+                        <div class="flex items-center mt-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(27 avis)</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold text-lg">2,200 FCFA/kg</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" min="1" value="1" class="w-16 px-2 py-1 border rounded text-center">
+                                <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 'oranges')">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="h-48 bg-gradient-to-br from-indigo-400 to-indigo-600 flex items-center justify-center">
+                        <i class="fas fa-fish text-white text-6xl"></i>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-semibold text-nnam-brown">Aubergines</h3>
+                        <p class="text-gray-600 text-sm mt-2">Fermier: Aminata Ba</p>
+                        <p class="text-gray-600 text-sm">Stock: 20kg disponibles</p>
+                        <div class="flex items-center mt-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">(15 avis)</span>
+                        </div>
+                        <div class="flex justify-between items-center mt-4">
+                            <span class="text-nnam-orange font-bold text-lg">2,800 FCFA/kg</span>
+                            <div class="flex items-center space-x-2">
+                                <input type="number" min="1" value="1" class="w-16 px-2 py-1 border rounded text-center">
+                                <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 'aubergines')">
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center mt-8">
+                <div class="flex space-x-2">
+                    <button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Précédent</button>
+                    <button class="px-4 py-2 bg-nnam-orange text-white rounded">1</button>
+                    <button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">2</button>
+                    <button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">3</button>
+                    <button class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">Suivant</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals pour les formulaires -->
+    
+    <!-- Modal Inscription -->
+    <div id="register-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="register-title" class="text-2xl font-bold text-nnam-brown">Inscription</h2>
+                <button onclick="closeModal('register-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="register-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Prénom</label>
+                        <input type="text" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Nom</label>
+                        <input type="text" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Email</label>
+                    <input type="email" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Téléphone</label>
+                    <input type="tel" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" required>
+                </div>
+                <div id="farmer-fields" class="hidden">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Localisation de la ferme</label>
+                        <input type="text" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" placeholder="Ville, région">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Superficie (hectares)</label>
+                        <input type="number" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" placeholder="10">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Types de cultures</label>
+                        <textarea class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" placeholder="Légumes, fruits, céréales..."></textarea>
+                    </div>
+                </div>
+                <div id="client-fields" class="hidden">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Adresse de livraison</label>
+                        <textarea class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" placeholder="Adresse complète"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Mot de passe</label>
+                    <input type="password" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Confirmer mot de passe</label>
+                    <input type="password" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-green" required>
+                </div>
+                <button type="submit" class="w-full bg-nnam-green text-white py-2 px-4 rounded-lg hover:bg-green-600 transition">
+                    S'inscrire
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Connexion -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="login-title" class="text-2xl font-bold text-nnam-brown">Connexion</h2>
+                <button onclick="closeModal('login-modal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Email</label>
+                    <input type="email" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-orange" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Mot de passe</label>
+                    <input type="password" class="form-input w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-nnam-orange" required>
+                </div>
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="mr-2">
+                        <span class="text-gray-700 text-sm">Se souvenir de moi</span>
+                    </label>
+                    <a href="#" class="text-nnam-orange text-sm hover:underline">Mot de passe oublié?</a>
+                </div>
+                <button type="submit" class="w-full bg-nnam-orange text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition">
+                    Se connecter
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Page Détail Produit -->
+    <div id="product-detail-page" class="page">
+        <div class="max-w-7xl mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Image du Produit -->
+                <div>
+                    <div id="product-image" class="h-96 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-carrot text-white text-8xl"></i>
+                    </div>
+                    <!-- Galerie miniatures -->
+                    <div class="flex space-x-2 mt-4">
+                        <div class="w-20 h-20 bg-green-200 rounded-lg flex items-center justify-center cursor-pointer">
+                            <i class="fas fa-carrot text-green-600 text-2xl"></i>
+                        </div>
+                        <div class="w-20 h-20 bg-green-200 rounded-lg flex items-center justify-center cursor-pointer">
+                            <i class="fas fa-leaf text-green-600 text-2xl"></i>
+                        </div>
+                        <div class="w-20 h-20 bg-green-200 rounded-lg flex items-center justify-center cursor-pointer">
+                            <i class="fas fa-seedling text-green-600 text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informations du Produit -->
+                <div>
+                    <h1 id="product-name" class="text-3xl font-bold text-nnam-brown mb-4">Carottes Bio Premium</h1>
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400 mr-2">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <span class="text-gray-600">(24 avis)</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">Fermier: <span class="font-medium text-nnam-brown">Jean-Baptiste Kouadio</span></p>
+                    <div class="text-3xl font-bold text-nnam-orange mb-6">2,500 FCFA<span class="text-lg text-gray-600">/kg</span></div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                        <h3 class="font-semibold text-nnam-brown mb-3">Description</h3>
+                        <p class="text-gray-700">Carottes biologiques cultivées sans pesticides ni engrais chimiques. Récoltées à maturité pour garantir une saveur optimale et une qualité nutritionnelle exceptionnelle. Parfaites pour vos soupes, salades et plats mijotés.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white border rounded-lg p-4">
+                            <div class="text-nnam-green font-semibold">Stock disponible</div>
+                            <div class="text-2xl font-bold text-gray-800">25 kg</div>
+                        </div>
+                        <div class="bg-white border rounded-lg p-4">
+                            <div class="text-nnam-orange font-semibold">Date de récolte</div>
+                            <div class="text-lg font-medium text-gray-800">12/11/2024</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-4 mb-6">
+                        <label class="font-medium text-gray-700">Quantité (kg):</label>
+                        <div class="flex items-center border rounded-lg">
+                            <button class="px-3 py-2 text-gray-600 hover:bg-gray-100" onclick="decreaseQuantity()">-</button>
+                            <input id="quantity-input" type="number" value="1" min="1" max="25" class="w-16 text-center py-2 border-0 focus:outline-none">
+                            <button class="px-3 py-2 text-gray-600 hover:bg-gray-100" onclick="increaseQuantity()">+</button>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-4 mb-8">
+                        <button class="flex-1 bg-nnam-green text-white py-3 px-6 rounded-lg hover:bg-green-600 transition" onclick="addToCartFromDetail()">
+                            <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+                        </button>
+                        <button class="bg-nnam-orange text-white py-3 px-6 rounded-lg hover:bg-orange-600 transition">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+
+                    <div class="border-t pt-6">
+                        <h3 class="font-semibold text-nnam-brown mb-3">Informations agriculteur</h3>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-nnam-green rounded-full flex items-center justify-center">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium">Jean-Baptiste Kouadio</div>
+                                <div class="text-gray-600 text-sm">Fermier depuis 15 ans</div>
+                                <div class="text-gray-600 text-sm">Dabou, Région d'Abidjan</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produits Similaires -->
+            <div class="mt-16">
+                <h2 class="text-2xl font-bold text-nnam-brown mb-8">Produits Similaires</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Répétition des cartes produits similaires -->
+                    <div class="product-card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer" onclick="showProductDetail(2)">
+                        <div class="h-48 bg-gradient-to-br from-yellow-400 to-yellow-600 flex items-center justify-center">
+                            <i class="fas fa-seedling text-white text-6xl"></i>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-semibold text-nnam-brown">Maïs Local</h3>
+                            <p class="text-gray-600 text-sm mt-2">Maïs de première qualité</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <span class="text-nnam-orange font-bold">1800 FCFA/kg</span>
+                                <button class="bg-nnam-green text-white px-3 py-1 rounded hover:bg-green-600 transition" onclick="addToCart(event, 2)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Autres produits similaires... -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript pour les interactions -->
+    <script>
+        // Variables globales
+        let currentSlide = 1;
+        let cartItems = [];
+        let currentUserType = '';
+
+        // Gestion du carrousel
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const indicators = document.querySelectorAll('.carousel-container .absolute.bottom-4 div');
+            
+            if (n > slides.length) currentSlide = 1;
+            if (n < 1) currentSlide = slides.length;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('bg-white'));
+            indicators.forEach(indicator => indicator.classList.add('bg-gray-400'));
+            
+            slides[currentSlide - 1].classList.add('active');
+            indicators[currentSlide - 1].classList.remove('bg-gray-400');
+            indicators[currentSlide - 1].classList.add('bg-white');
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide += 1);
+        }
+
+        function currentSlideFunc(n) {
+            showSlide(currentSlide = n);
+        }
+
+        // Auto-slide du carrousel
+        setInterval(nextSlide, 4000);
+
+        // Gestion des dropdowns
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId + '-dropdown');
+            const allDropdowns = document.querySelectorAll('[id$="-dropdown"]');
+            
+            // Fermer tous les autres dropdowns
+            allDropdowns.forEach(dd => {
+                if (dd.id !== dropdownId + '-dropdown') {
+                    dd.classList.add('hidden');
+                }
+            });
+            
+            // Toggle le dropdown cliqué
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Gestion du menu mobile
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Navigation entre les pages
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            const targetPage = document.getElementById(pageId + '-page');
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+            
+            // Fermer les dropdowns et le menu mobile
+            const allDropdowns = document.querySelectorAll('[id$="-dropdown"]');
+            allDropdowns.forEach(dd => dd.classList.add('hidden'));
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Affichage des formulaires d'inscription
+        function showRegisterForm(userType) {
+            currentUserType = userType;
+            const modal = document.getElementById('register-modal');
+            const title = document.getElementById('register-title');
+            const farmerFields = document.getElementById('farmer-fields');
+            const clientFields = document.getElementById('client-fields');
+            
+            title.textContent = `Inscription ${userType === 'agriculteur' ? 'Agriculteur' : 'Client'}`;
+            
+            if (userType === 'agriculteur') {
+                farmerFields.classList.remove('hidden');
+                clientFields.classList.add('hidden');
+            } else {
+                farmerFields.classList.add('hidden');
+                clientFields.classList.remove('hidden');
+            }
+            
+            modal.classList.remove('hidden');
+            toggleDropdown('register'); // Fermer le dropdown
+        }
+
+        // Affichage des formulaires de connexion
+        function showLoginForm(userType) {
+            currentUserType = userType;
+            const modal = document.getElementById('login-modal');
+            const title = document.getElementById('login-title');
+            
+            title.textContent = `Connexion ${userType === 'agriculteur' ? 'Agriculteur' : 'Client'}`;
+            modal.classList.remove('hidden');
+            toggleDropdown('login'); // Fermer le dropdown
+        }
+
+        // Fermeture des modals
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Gestion du panier
+        function addToCart(event, productId) {
+            event.stopPropagation();
+            const cartCount = document.getElementById('cart-count');
+            const clientCartCount = document.getElementById('client-cart-count');
+            
+            let currentCount = parseInt(cartCount.textContent);
+            cartCount.textContent = currentCount + 1;
+            
+            if (clientCartCount) {
+                clientCartCount.textContent = currentCount + 1;
+            }
+            
+            // Animation de feedback
+            const button = event.target.closest('button');
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            button.classList.remove('bg-nnam-green', 'hover:bg-green-600');
+            button.classList.add('bg-green-500');
+            
+            setTimeout(() => {
+                button.innerHTML = '<i class="fas fa-plus"></i>';
+                button.classList.remove('bg-green-500');
+                button.classList.add('bg-nnam-green', 'hover:bg-green-600');
+            }, 1000);
+        }
+
+        // Affichage des détails produit
+        function showProductDetail(productId) {
+            showPage('product-detail');
+            
+            // Données de produits d'exemple
+            const products = {
+                1: {
+                    name: 'Carottes Bio Premium',
+                    price: '2,500',
+                    farmer: 'Jean-Baptiste Kouadio',
+                    stock: '25',
+                    icon: 'fas fa-carrot',
+                    color: 'from-green-400 to-green-600'
+                },
+                2: {
+                    name: 'Maïs Local de Qualité',
+                    price: '1,800',
+                    farmer: 'Marie Kouassi',
+                    stock: '40',
+                    icon: 'fas fa-seedling',
+                    color: 'from-yellow-400 to-yellow-600'
+                }
+            };
+            
+            const product = products[productId] || products[1];
+            document.getElementById('product-name').textContent = product.name;
+            
+            const productImage = document.getElementById('product-image');
+            productImage.className = `h-96 bg-gradient-to-br ${product.color} rounded-lg flex items-center justify-center`;
+            productImage.innerHTML = `<i class="${product.icon} text-white text-8xl"></i>`;
+        }
+
+        // Gestion de la quantité dans le détail produit
+        function increaseQuantity() {
+            const input = document.getElementById('quantity-input');
+            const max = parseInt(input.getAttribute('max'));
+            const current = parseInt(input.value);
+            if (current < max) {
+                input.value = current + 1;
+            }
+        }
+
+        function decreaseQuantity() {
+            const input = document.getElementById('quantity-input');
+            const current = parseInt(input.value);
+            if (current > 1) {
+                input.value = current - 1;
+            }
+        }
+
+        function addToCartFromDetail() {
+            const quantity = parseInt(document.getElementById('quantity-input').value);
+            const cartCount = document.getElementById('cart-count');
+            const clientCartCount = document.getElementById('client-cart-count');
+            
+            let currentCount = parseInt(cartCount.textContent);
+            cartCount.textContent = currentCount + quantity;
+            
+            if (clientCartCount) {
+                clientCartCount.textContent = currentCount + quantity;
+            }
+            
+            // Feedback visuel
+            alert(`${quantity} kg ajouté(s) au panier !`);
+        }
+
+        // Gestion des catégories
+        function showCategory(category) {
+            showPage('client');
+            toggleDropdown('categories');
+            
+            // Ici vous pourriez filtrer les produits par catégorie
+            console.log(`Affichage de la catégorie: ${category}`);
+        }
+
+        // Gestion agriculteur - suppression de produit
+        function deleteProduct(productId) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+                // Ici vous feriez l'appel API pour supprimer le produit
+                alert(`Produit ${productId} supprimé !`);
+            }
+        }
+
+        // Gestion agriculteur - édition de produit
+        function editProduct(productId) {
+            alert(`Édition du produit ${productId} - Cette fonctionnalité sera développée`);
+        }
+
+        // Soumission des formulaires
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert(`Inscription ${currentUserType} réussie !`);
+            closeModal('register-modal');
+            
+            // Rediriger vers la page appropriée
+            if (currentUserType === 'agriculteur') {
+                showPage('farmer');
+            } else {
+                showPage('client');
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert(`Connexion ${currentUserType} réussie !`);
+            closeModal('login-modal');
+            
+            // Rediriger vers la page appropriée
+            if (currentUserType === 'agriculteur') {
+                showPage('farmer');
+            } else {
+                showPage('client');
+            }
+        });
+
+        document.getElementById('add-product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Produit ajouté avec succès !');
+            this.reset();
+        });
+
+        // Fermer les dropdowns en cliquant ailleurs
+        document.addEventListener('click', function(event) {
+            const dropdowns = document.querySelectorAll('[id$="-dropdown"]');
+            dropdowns.forEach(dropdown => {
+                if (!dropdown.closest('.relative').contains(event.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        });
+
+        // Fermer les modals en cliquant sur l'arrière-plan
+        document.getElementById('register-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal('register-modal');
+            }
+        });
+
+        document.getElementById('login-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal('login-modal');
+            }
+        });
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            showSlide(1);
+            console.log('Plateforme Nnam initialisée avec succès !');
+        });
+    </script>
+</body>
+</html>
